@@ -2,12 +2,14 @@ from time import sleep
 
 from RPi import GPIO
 
+from deploy import DeployModule
+
 
 class Main(object):
     def __init__(self):
         try:
             GPIO.setmode(GPIO.BCM)
-            self.modules = []
+            self.modules = [DeployModule()]
         except Exception as e:
             print(e)
             GPIO.cleanup()
