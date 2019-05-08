@@ -8,12 +8,12 @@ class Button(object):
         self.pin = pin
         self.callback = callback
         if pin > 5:
-            GPIO.setup(self.pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+            GPIO.setup(self.pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
         else:
             GPIO.setup(self.pin, GPIO.IN)
 
     def read_input(self):
-        new_value = not GPIO.input(self.pin)
+        new_value = GPIO.input(self.pin)
 
         if self.value != new_value:
             self.value = new_value
