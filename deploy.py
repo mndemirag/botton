@@ -1,3 +1,5 @@
+from time import sleep
+
 from button import Button
 from lcd import LCD
 
@@ -11,8 +13,15 @@ class DeployModule(object):
 
     def pressed(self, new_value):
         if new_value:
-            print('Deploy!!')
-            self.lcd.write('TJENA!')
+            print('Deploying...')
+            self.lcd.write('DEPLOYING.', 0)
+            sleep(0.5)
+            self.lcd.write('DEPLOYING..', 0)
+            sleep(0.5)
+            self.lcd.write('DEPLOYING...', 0)
+            sleep(1)
+            self.lcd.write('DEPLOYED!   ', 0)
+            self.lcd.write('ANOTHER LINE', 1)
 
     def process(self):
         self.deploy_button.read_input()

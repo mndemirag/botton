@@ -24,11 +24,11 @@ class LCD(object):
     def clear(self):
         self.lcd.clear()
 
-    def write(self, string):
+    def write(self, string, row):
         if string == '':
             self.lcd.clear()
         else:
-            self.lcd.setCursor(0, 0)
+            self.lcd.setCursor(0, row)
             self.lcd.message(string)
 
     def destroy(self):
