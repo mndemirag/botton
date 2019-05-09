@@ -42,6 +42,18 @@ Example response:
 ```
 
 **Merge a PR:**<br>
-`PUT http://localhost:5050/repos/:REPO_NAME/pulls/:PR_NUMBER`
+`PUT http://localhost:5050/repos/:REPO_NAME/pulls/:PR_NUMBER/merge`
 
-Response is the actual JSON response from GHE API
+Example response, success:
+```json
+{
+  "message": "Success: all done"
+}
+```
+
+Example response, failure (ie clicking button twice):
+```json
+{
+  "message": "-- error --"
+}
+```

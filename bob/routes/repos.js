@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const {getRepos, getPRs, mergePR} = require('../ghe-service');
 
+const GENERIC_ERROR_MESSAGE = '-- error --';
+
 // List of all repos
 router.get('/', (req, res, next) => {
   res.json({
@@ -16,7 +18,7 @@ router.get('/:repoId/pulls', (req, res, next) => {
 
   if (!repo) {
     return res.json({
-      error: 'Unknown repo',
+      message: GENERIC_ERROR_MESSAGE,
     });
   }
 
@@ -31,13 +33,15 @@ router.put('/:repoId/pulls/:prId/merge', (req, res, next) => {
   const {repoId, prId} = req.params;
 
   if (!getPRs(repoId).find(pr => pr.id === parseInt(prId))) {
-    return res.json({
-      error: 'Unknown PR number',
-    });
+    return res.json({ message: GENERIC_ERROR_MESSAGE });
   }
   
-  mergePR(repoId, prId, result => {
-    res.json(result);
+  mergePR(repoId, prId, (result = {}) => {
+    if (result.merged) {
+      return res.json({ message: 'Success: all done' });
+    }
+    
+    return res.json({ message: GENERIC_ERROR_MESSAGE })
   });
  
 });

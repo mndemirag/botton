@@ -56,7 +56,10 @@ const mergePR = (repoId, prId, callback) => {
     method: 'PUT',
     body: { merge_method: 'squash' },
   }, (err, res, body) => {
-    if (err) { console.log(err); return; }
+    if (err) { 
+      console.log(err); 
+      return callback(); 
+    }
     callback(body);
   });
 };
