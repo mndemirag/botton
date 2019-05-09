@@ -1,3 +1,4 @@
 .idea
 *.pyc
-nodeservice/node_modules
+bob/node_modules
+venv
