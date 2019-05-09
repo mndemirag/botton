@@ -1,7 +1,6 @@
-from time import sleep
-
 from button import Button
 from lcd import LCD
+from api import BobApi
 
 DEPLOY_BUTTON_PORT = 22
 REPO_BUTTON_NEXT_PORT = 23
@@ -18,7 +17,7 @@ class DeployModule(object):
         self.select_pr_next_button = Button(PR_BUTTON_NEXT_PORT, self.select_next_pr)
         self.select_pr_prev_button = Button(PR_BUTTON_PREV_PORT, self.select_prev_pr)
         self.lcd = LCD()
-
+        self.bob_api = BobApi()
         self.selected_repo_index = 0
         self.selected_pr_index = 0
         self.repo_list = []
@@ -33,14 +32,17 @@ class DeployModule(object):
         if new_value:
             print('Deploying ' + self.pull_requests[self.selected_pr_index]['title'])
             self.lcd.write('Deploying...', 0)
+            response = self.bob_api.deploy(self.repo_list[self.selected_repo_index]['id'],
+                                self.pull_requests[self.selected_pr_index]['id'])
+            self.lcd.write(response['message'], 1)
+
 
     def fetch_repos(self):
-        # TODO: actually fetch repos
-        sleep(1)
-        self.repo_list = [
-            {'display_name': 'susi-backend', 'id': 'support-site-backend'},
-            {'display_name': 'susi-frontend', 'id': 'support-site-frontend'}
-        ]
+        self.repo_list = self.bob_api.get_repos()
+        #self.repo_list = [
+        #    {'display_name': 'susi-backend', 'id': 'support-site-backend'},
+        #    {'display_name': 'susi-frontend', 'id': 'support-site-frontend'}
+        #]
 
         if len(self.repo_list) is 0:
             self.repo_list = [
@@ -48,18 +50,17 @@ class DeployModule(object):
             ]
 
     def fetch_pull_requests(self):
-        # TODO: actually fetch new PRs for current repo
-        sleep(1)
+        self.pull_requests = self.bob_api.get_pull_requests(self.repo_list[self.selected_repo_index]['id'])
 
-        self.pull_requests = [
-            {'id': 1, 'title': 'update README'},
-            {'id': 2, 'title': 'Fix lint'}
-        ]
+        #self.pull_requests = [
+        #    {'id': 1, 'title': 'update README'},
+        #    {'id': 2, 'title': 'Fix lint'}
+        #]
         self.selected_pr_index = 0
 
         if len(self.pull_requests) is 0:
             self.pull_requests = [
-                {'id': 0, 'title': '-- No approved PRs'},
+                {'id': 0, 'title': '-- No PRs'},
             ]
 
     def update_repo(self):
