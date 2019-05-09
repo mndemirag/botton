@@ -19,8 +19,8 @@ class BobApi(object):
 
     def deploy(self, repo_name, pr_number):
         return self.handle_response(requests.put(
-            '{base}/repos/{repo_name}/pulls/{pr_number}'.format(base=self.base_url, repo_name=repo_name,
-                                                                pr_number=pr_number)))
+            '{base}/repos/{repo_name}/pulls/{pr_number}/merge'.format(base=self.base_url, repo_name=repo_name,
+                                                                      pr_number=pr_number)))
 
     def handle_response(self, response):
         if response.status_code == 200:
