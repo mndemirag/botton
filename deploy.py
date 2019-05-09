@@ -1,11 +1,13 @@
+from time import sleep
+
 from button import Button
 from lcd import LCD
 
 DEPLOY_BUTTON_PORT = 22
 REPO_BUTTON_NEXT_PORT = 23
 REPO_BUTTON_PREV_PORT = 24
-PR_BUTTON_NEXT_PORT = 25
-PR_BUTTON_PREV_PORT = 26
+PR_BUTTON_NEXT_PORT = 17
+PR_BUTTON_PREV_PORT = 18
 
 
 class DeployModule(object):
@@ -19,18 +21,55 @@ class DeployModule(object):
 
         self.selected_repo_index = 0
         self.selected_pr_index = 0
-        self.repo_list = ['susi-frontend', 'susi-backend', 'taavi']
-        self.pull_requests = [
-            {'id': 1, 'title': 'update README'},
-            {'id': 2, 'title': 'Fix lint'}
-        ]
-        self.lcd.write(self.repo_list[self.selected_repo_index], 0)
-        self.lcd.write(self.pull_requests[self.selected_pr_index]['title'], 1)
+        self.repo_list = []
+        self.pull_requests = []
+
+        self.lcd.write('Loading...', 0)
+
+        self.fetch_repos()
+        self.update_repo()
 
     def deploy(self, new_value):
         if new_value:
             print('Deploying ' + self.pull_requests[self.selected_pr_index]['title'])
-            self.lcd.write('TJENA!', 0)
+            self.lcd.write('Deploying...', 0)
+
+    def fetch_repos(self):
+        # TODO: actually fetch repos
+        sleep(1)
+        self.repo_list = [
+            {'display_name': 'susi-backend', 'id': 'support-site-backend'},
+            {'display_name': 'susi-frontend', 'id': 'support-site-frontend'}
+        ]
+
+        if len(self.repo_list) is 0:
+            self.repo_list = [
+                {'display_name': '-- No repos found'},
+            ]
+
+    def fetch_pull_requests(self):
+        # TODO: actually fetch new PRs for current repo
+        sleep(1)
+
+        self.pull_requests = [
+            {'id': 1, 'title': 'update README'},
+            {'id': 2, 'title': 'Fix lint'}
+        ]
+        self.selected_pr_index = 0
+
+        if len(self.pull_requests) is 0:
+            self.pull_requests = [
+                {'id': 0, 'title': '-- No approved PRs'},
+            ]
+
+    def update_repo(self):
+        self.lcd.write(self.repo_list[self.selected_repo_index]['display_name'], 0)
+        self.lcd.write('Loading...', 1)
+        self.fetch_pull_requests()
+        self.update_pr()
+
+    def update_pr(self):
+        self.lcd.write(self.pull_requests[self.selected_pr_index]['title'], 1)
 
     def select_prev_repo(self, on):
         if on:
@@ -40,8 +79,7 @@ class DeployModule(object):
             else:
                 self.selected_repo_index -= 1
 
-            self.lcd.write(self.repo_list[self.selected_repo_index], 0)
-            self.lcd.write(self.pull_requests[self.selected_pr_index]['title'], 1)
+            self.update_repo()
 
     def select_next_repo(self, on):
         if on:
@@ -51,8 +89,7 @@ class DeployModule(object):
             else:
                 self.selected_repo_index += 1
 
-            self.lcd.write(self.repo_list[self.selected_repo_index], 0)
-            self.lcd.write(self.pull_requests[self.selected_pr_index]['title'], 1)
+            self.update_repo()
 
     def select_prev_pr(self, on):
         if on:
@@ -62,7 +99,7 @@ class DeployModule(object):
             else:
                 self.selected_pr_index -= 1
 
-            self.lcd.write(self.pull_requests[self.selected_pr_index]['title'], 1)
+            self.update_pr()
 
     def select_next_pr(self, on):
         if on:
@@ -72,13 +109,13 @@ class DeployModule(object):
             else:
                 self.selected_pr_index += 1
 
-            self.lcd.write(self.pull_requests[self.selected_pr_index]['title'], 1)
+            self.update_pr()
 
     def process(self):
         self.deploy_button.read_input()
         self.select_repo_next_button.read_input()
         self.select_repo_prev_button.read_input()
-        self.select_pr_prev_button.read_input()
+        self.select_pr_next_button.read_input()
         self.select_pr_prev_button.read_input()
 
     def destroy(self):
