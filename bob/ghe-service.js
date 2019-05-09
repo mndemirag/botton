@@ -22,7 +22,7 @@ const REPOSITORIES = [
   },
   {
     display_name: 'botton (meta!)',
-    id: 'botton',
+    id: 'botton-demo',
   }
 ];
 
