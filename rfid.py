@@ -8,22 +8,14 @@ class RFID(object):
 
     def read(self):
         print("Reading from rfid...")
-        while True:
 
-            # Scan for cards
-            (status, TagType) = self.rfid.MFRC522_Request(self.rfid.PICC_REQIDL)
-            print('Status: ' + str(status))
-            print ('TagType: ' + str(TagType))
+        # Scan for cards
+        (status, TagType) = self.rfid.MFRC522_Request(self.rfid.PICC_REQIDL)
 
-            # Get the UID of the card
-            (status, uid) = self.rfid.MFRC522_Anticoll()
-            print ('Status: ' + str(status))
-            print ('UID: ' + str(uid))
+        # Get the UID of the card
+        (status, uid_array) = self.rfid.MFRC522_Anticoll()
+        uid = ''.join(map(lambda x: str(x), uid_array))
 
-            # If we have the UID, continue
-            if status == self.rfid.MI_OK:
-                # Print UID
-                print("Card UID: " + str(uid[0]) + "," + str(uid[1]) + "," + str(
-                    uid[2]) + "," + str(
-                    uid[3]))
-                self.callback(uid)
+        # If we have the UID, continue
+        if status == self.rfid.MI_OK:
+            self.callback(uid)

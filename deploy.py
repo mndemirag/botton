@@ -17,24 +17,25 @@ class DeployModule(object):
         self.select_repo_prev_button = Button(REPO_BUTTON_PREV_PORT, self.select_prev_repo)
         self.select_pr_next_button = Button(PR_BUTTON_NEXT_PORT, self.select_next_pr)
         self.select_pr_prev_button = Button(PR_BUTTON_PREV_PORT, self.select_prev_pr)
-        self.rfid = RFID(self.store_rfid_uid)
         self.lcd = LCD()
-        self.bob_api = BobApi()
+
+        self.rfid = RFID(self.store_uid)
+        self.uid = self.rfid.read()
+
+        self.bob_api = BobApi(self.uid)
         self.selected_repo_index = 0
         self.selected_pr_index = 0
         self.repo_list = []
         self.pull_requests = []
-
-        self.rfid_uid = self.rfid.read()
 
         self.lcd.write('Loading...', 0)
 
         self.fetch_repos()
         self.update_repo()
 
-    def store_rfid_uid(self, uid):
+    def store_uid(self, uid):
         print('Storing uid ' + uid)
-        self.rfid_uid = uid
+        self.uid = uid
 
     def deploy(self, new_value):
         if new_value:
@@ -126,6 +127,7 @@ class DeployModule(object):
         self.select_repo_prev_button.read_input()
         self.select_pr_next_button.read_input()
         self.select_pr_prev_button.read_input()
+        self.rfid.read()
 
     def destroy(self):
         self.lcd.destroy()
