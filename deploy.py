@@ -1,6 +1,6 @@
+from api import BobApi
 from button import Button
 from lcd import LCD
-from api import BobApi
 from rfid import RFID
 
 DEPLOY_BUTTON_PORT = 22
@@ -19,52 +19,40 @@ class DeployModule(object):
         self.select_pr_prev_button = Button(PR_BUTTON_PREV_PORT, self.select_prev_pr)
         self.lcd = LCD()
 
-        self.rfid = RFID(self.store_uid)
-        self.uid = self.rfid.read()
+        print('Authorize...')
+        self.rfid = RFID(self.startup)
 
-        self.bob_api = BobApi(self.uid)
         self.selected_repo_index = 0
         self.selected_pr_index = 0
         self.repo_list = []
         self.pull_requests = []
 
+    def startup(self, uid):
+        print('Got uid ' + uid)
+        self.bob_api = BobApi(uid)
         self.lcd.write('Loading...', 0)
-
         self.fetch_repos()
         self.update_repo()
-
-    def store_uid(self, uid):
-        print('Storing uid ' + uid)
-        self.uid = uid
 
     def deploy(self, new_value):
         if new_value:
             print('Deploying ' + self.pull_requests[self.selected_pr_index]['title'])
             self.lcd.write('Deploying...', 0)
             response = self.bob_api.deploy(self.repo_list[self.selected_repo_index]['id'],
-                                self.pull_requests[self.selected_pr_index]['id'])
+                                           self.pull_requests[self.selected_pr_index]['id'])
             self.lcd.write(response['message'], 1)
-
 
     def fetch_repos(self):
         self.repo_list = self.bob_api.get_repos()
-        #self.repo_list = [
-        #    {'display_name': 'susi-backend', 'id': 'support-site-backend'},
-        #    {'display_name': 'susi-frontend', 'id': 'support-site-frontend'}
-        #]
-
+        print(self.repo_list)
         if len(self.repo_list) is 0:
             self.repo_list = [
                 {'display_name': '-- No repos found'},
             ]
 
     def fetch_pull_requests(self):
-        self.pull_requests = self.bob_api.get_pull_requests(self.repo_list[self.selected_repo_index]['id'])
-
-        #self.pull_requests = [
-        #    {'id': 1, 'title': 'update README'},
-        #    {'id': 2, 'title': 'Fix lint'}
-        #]
+        self.pull_requests = self.bob_api.get_pull_requests(
+            self.repo_list[self.selected_repo_index]['id'])
         self.selected_pr_index = 0
 
         if len(self.pull_requests) is 0:

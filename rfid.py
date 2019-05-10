@@ -18,4 +18,5 @@ class RFID(object):
 
         # If we have the UID, continue
         if status == self.rfid.MI_OK:
+            print('Got uid: ' + uid)
             self.callback(uid)

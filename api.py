@@ -1,12 +1,13 @@
 import requests
 
-BOB_BASE_URL = 'http://10.43.114.109:5050'
+BOB_BASE_URL = 'http://10.43.117.212:5050'
 
 class BobApi(object):
     def __init__(self, uid):
         self.uid = uid
 
     def get_repos(self):
+        print('self uid:' + self.uid)
         url = '{base}/repos'.format(base=BOB_BASE_URL)
         return self.handle_response(requests.get(url, headers={'uid': self.uid})).get('repos')
 
@@ -22,6 +23,7 @@ class BobApi(object):
 
     def handle_response(self, response):
         if response.status_code == 200:
+            print(response.json())
             return response.json()
         else:
             raise Exception('Response not satisfactory', response)
