@@ -19,13 +19,14 @@ class DeployModule(object):
         self.select_pr_prev_button = Button(PR_BUTTON_PREV_PORT, self.select_prev_pr)
         self.lcd = LCD()
 
-        print('Authorize...')
-        self.rfid = RFID(self.startup)
-
         self.selected_repo_index = 0
         self.selected_pr_index = 0
         self.repo_list = []
         self.pull_requests = []
+
+        print('Authorize...')
+        self.lcd.write('Authorize...', 0)
+        self.rfid = RFID(self.startup)
 
     def startup(self, uid):
         print('Got uid ' + uid)
