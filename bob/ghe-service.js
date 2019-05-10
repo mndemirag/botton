@@ -49,12 +49,15 @@ const getPRs = repoId => {
 }
 
 // Merge a specific PR in a specific repo. 
-const mergePR = (repoId, prId, callback) => {
+const mergePR = (repoId, prId, token, callback) => {
   const url = `${BASE_URL}repos/first-aid/${repoId}/pulls/${prId}/merge`;
   request(url, {
     ...requestConfig, 
     method: 'PUT',
     body: { merge_method: 'squash' },
+    headers: {
+      'Authorization': `token ${token}`,
+    }
   }, (err, res, body) => {
     if (err) { 
       console.log(err); 
