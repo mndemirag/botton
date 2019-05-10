@@ -8,7 +8,7 @@ const GENERIC_ERROR_MESSAGE = '-- error --';
 let credentials = JSON.parse(fs.readFileSync('credentials.json'));  
 
 const getUser = (req) => {
-  return credentials[req.get('Uid')];
+  return credentials[req.get('uid')];
 };
 
 // List of all repos
