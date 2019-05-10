@@ -1,4 +1,5 @@
 .idea
 *.pyc
 bob/node_modules
+bob/credentials.json
 venv
