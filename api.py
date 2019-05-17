@@ -1,6 +1,7 @@
 import requests
 
-BOB_BASE_URL = 'http://10.43.117.212:5050'
+BOB_BASE_URL = 'http://192.168.0.1:5050'
+
 
 class BobApi(object):
     def __init__(self, uid):
