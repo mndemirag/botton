@@ -31,9 +31,9 @@ class DeployModule(object):
         self.lcd.write('Authorize...', 0)
         self.rfid = RFID(self.startup)
 
-    def startup(self, uid):
-        print('Got uid ' + uid)
-        self.bob_api = BobApi(uid)
+    def startup(self, tag):
+        print('Got tag ' + tag)
+        self.bob_api = BobApi(tag)
         self.refresh_repos()
 
     def refresh_repos(self):
