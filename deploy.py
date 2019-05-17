@@ -12,6 +12,7 @@ PR_BUTTON_PREV_PORT = 18
 
 class DeployModule(object):
     bob_api = None
+    deployed = False
 
     def __init__(self):
         self.deploy_button = Button(DEPLOY_BUTTON_PORT, self.deploy)
@@ -33,17 +34,13 @@ class DeployModule(object):
     def startup(self, uid):
         print('Got uid ' + uid)
         self.bob_api = BobApi(uid)
+        self.refresh_repos()
+
+    def refresh_repos(self):
+        self.lcd.clear()
         self.lcd.write('Loading...', 0)
         self.fetch_repos()
         self.update_repo()
-
-    def deploy(self, new_value):
-        if new_value:
-            print('Deploying ' + self.pull_requests[self.selected_pr_index]['title'])
-            self.lcd.write('Deploying...', 0)
-            response = self.bob_api.deploy(self.repo_list[self.selected_repo_index]['id'],
-                                           self.pull_requests[self.selected_pr_index]['id'])
-            self.lcd.write(response['message'], 1)
 
     def fetch_repos(self):
         self.repo_list = self.bob_api.get_repos()
@@ -72,45 +69,76 @@ class DeployModule(object):
     def update_pr(self):
         self.lcd.write(self.pull_requests[self.selected_pr_index]['title'], 1)
 
+    def handle_after_deploy_input(self):
+        self.deployed = False
+        self.refresh_repos()
+
+    def deploy(self, pressed_down):
+        if pressed_down:
+            if self.deployed:
+                self.handle_after_deploy_input()
+            else:
+                pr = self.pull_requests[self.selected_pr_index]
+                print('Deploying ' + pr['title'])
+                self.lcd.clear()
+                self.lcd.write('Deploying...', 0)
+                response = self.bob_api.deploy(self.repo_list[self.selected_repo_index]['id'],
+                                               pr['id'])
+                self.lcd.write(response['message'], 1)
+                self.deployed = True
+
     def select_prev_repo(self, on):
         if on:
             print('repo prev')
-            if self.selected_repo_index is 0:
-                self.selected_repo_index = len(self.repo_list) - 1
+            if self.deployed:
+                self.handle_after_deploy_input()
             else:
-                self.selected_repo_index -= 1
+                if self.selected_repo_index is 0:
+                    self.selected_repo_index = len(self.repo_list) - 1
+                else:
+                    self.selected_repo_index -= 1
 
-            self.update_repo()
+                self.update_repo()
 
     def select_next_repo(self, on):
         if on:
             print('repo next')
-            if self.selected_repo_index is len(self.repo_list) - 1:
-                self.selected_repo_index = 0
-            else:
-                self.selected_repo_index += 1
 
-            self.update_repo()
+            if self.deployed:
+                self.handle_after_deploy_input()
+            else:
+                if self.selected_repo_index is len(self.repo_list) - 1:
+                    self.selected_repo_index = 0
+                else:
+                    self.selected_repo_index += 1
+
+                self.update_repo()
 
     def select_prev_pr(self, on):
         if on:
             print('pr prev')
-            if self.selected_pr_index is 0:
-                self.selected_pr_index = len(self.pull_requests) - 1
+            if self.deployed:
+                self.handle_after_deploy_input()
             else:
-                self.selected_pr_index -= 1
+                if self.selected_pr_index is 0:
+                    self.selected_pr_index = len(self.pull_requests) - 1
+                else:
+                    self.selected_pr_index -= 1
 
-            self.update_pr()
+                self.update_pr()
 
     def select_next_pr(self, on):
         if on:
             print('pr next')
-            if self.selected_pr_index is len(self.pull_requests) - 1:
-                self.selected_pr_index = 0
+            if self.deployed:
+                self.handle_after_deploy_input()
             else:
-                self.selected_pr_index += 1
+                if self.selected_pr_index is len(self.pull_requests) - 1:
+                    self.selected_pr_index = 0
+                else:
+                    self.selected_pr_index += 1
 
-            self.update_pr()
+                self.update_pr()
 
     def process(self):
         self.deploy_button.read_input()
@@ -122,4 +150,6 @@ class DeployModule(object):
             self.rfid.read()
 
     def destroy(self):
+        self.lcd.clear()
+        self.lcd.write('Shutdown', 0)
         self.lcd.destroy()
