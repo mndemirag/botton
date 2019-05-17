@@ -103,28 +103,25 @@ class DeployModule(object):
                         self.selected_repo_index = len(self.repo_list) - 1
                     else:
                         self.selected_repo_index -= 1
-
-                    self.update_repo()
                 elif type == 'repo next':
                     if self.selected_repo_index is len(self.repo_list) - 1:
                         self.selected_repo_index = 0
                     else:
                         self.selected_repo_index += 1
-
-                    self.update_repo()
                 elif type == 'pr prev':
                     if self.selected_pr_index is 0:
                         self.selected_pr_index = len(self.pull_requests) - 1
                     else:
                         self.selected_pr_index -= 1
-
-                    self.update_pr()
                 elif type == 'pr next':
                     if self.selected_pr_index is len(self.pull_requests) - 1:
                         self.selected_pr_index = 0
                     else:
                         self.selected_pr_index += 1
 
+                if 'repo' in type:
+                    self.update_repo()
+                elif 'pr' in type:
                     self.update_pr()
 
     def process(self):
