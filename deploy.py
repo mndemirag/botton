@@ -11,6 +11,8 @@ PR_BUTTON_PREV_PORT = 18
 
 
 class DeployModule(object):
+    bob_api = None
+
     def __init__(self):
         self.deploy_button = Button(DEPLOY_BUTTON_PORT, self.deploy)
         self.select_repo_next_button = Button(REPO_BUTTON_NEXT_PORT, self.select_next_repo)
@@ -116,7 +118,8 @@ class DeployModule(object):
         self.select_repo_prev_button.read_input()
         self.select_pr_next_button.read_input()
         self.select_pr_prev_button.read_input()
-        self.rfid.read()
+        if not self.bob_api:
+            self.rfid.read()
 
     def destroy(self):
         self.lcd.destroy()
