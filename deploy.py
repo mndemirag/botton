@@ -16,10 +16,10 @@ class DeployModule(object):
 
     def __init__(self):
         self.deploy_button = Button(DEPLOY_BUTTON_PORT, self.deploy)
-        self.select_repo_next_button = Button(REPO_BUTTON_NEXT_PORT, self.select_next_repo)
-        self.select_repo_prev_button = Button(REPO_BUTTON_PREV_PORT, self.select_prev_repo)
-        self.select_pr_next_button = Button(PR_BUTTON_NEXT_PORT, self.select_next_pr)
-        self.select_pr_prev_button = Button(PR_BUTTON_PREV_PORT, self.select_prev_pr)
+        self.select_repo_next_button = Button(REPO_BUTTON_NEXT_PORT, lambda on: self.select_change('repo next', on))
+        self.select_repo_prev_button = Button(REPO_BUTTON_PREV_PORT, lambda on: self.select_change('repo prev', on))
+        self.select_pr_next_button = Button(PR_BUTTON_NEXT_PORT, lambda on: self.select_change('pr next', on))
+        self.select_pr_prev_button = Button(PR_BUTTON_PREV_PORT, lambda on: self.select_change('pr prev', on))
         self.lcd = LCD()
 
         self.selected_repo_index = 0
@@ -87,58 +87,45 @@ class DeployModule(object):
                 self.lcd.write(response['message'], 1)
                 self.deployed = True
 
-    def select_prev_repo(self, on):
+    def create_select_change_handler(self, type):
+        def handler(on):
+            self.select_change(type, on)
+
+        return handler
+
+    def select_change(self, type, on):
         if on:
-            print('repo prev')
             if self.deployed:
                 self.handle_after_deploy_input()
             else:
-                if self.selected_repo_index is 0:
-                    self.selected_repo_index = len(self.repo_list) - 1
-                else:
-                    self.selected_repo_index -= 1
+                if type == 'repo prev':
+                    if self.selected_repo_index is 0:
+                        self.selected_repo_index = len(self.repo_list) - 1
+                    else:
+                        self.selected_repo_index -= 1
 
-                self.update_repo()
+                    self.update_repo()
+                elif type == 'repo next':
+                    if self.selected_repo_index is len(self.repo_list) - 1:
+                        self.selected_repo_index = 0
+                    else:
+                        self.selected_repo_index += 1
 
-    def select_next_repo(self, on):
-        if on:
-            print('repo next')
+                    self.update_repo()
+                elif type == 'pr prev':
+                    if self.selected_pr_index is 0:
+                        self.selected_pr_index = len(self.pull_requests) - 1
+                    else:
+                        self.selected_pr_index -= 1
 
-            if self.deployed:
-                self.handle_after_deploy_input()
-            else:
-                if self.selected_repo_index is len(self.repo_list) - 1:
-                    self.selected_repo_index = 0
-                else:
-                    self.selected_repo_index += 1
+                    self.update_pr()
+                elif type == 'pr next':
+                    if self.selected_pr_index is len(self.pull_requests) - 1:
+                        self.selected_pr_index = 0
+                    else:
+                        self.selected_pr_index += 1
 
-                self.update_repo()
-
-    def select_prev_pr(self, on):
-        if on:
-            print('pr prev')
-            if self.deployed:
-                self.handle_after_deploy_input()
-            else:
-                if self.selected_pr_index is 0:
-                    self.selected_pr_index = len(self.pull_requests) - 1
-                else:
-                    self.selected_pr_index -= 1
-
-                self.update_pr()
-
-    def select_next_pr(self, on):
-        if on:
-            print('pr next')
-            if self.deployed:
-                self.handle_after_deploy_input()
-            else:
-                if self.selected_pr_index is len(self.pull_requests) - 1:
-                    self.selected_pr_index = 0
-                else:
-                    self.selected_pr_index += 1
-
-                self.update_pr()
+                    self.update_pr()
 
     def process(self):
         self.deploy_button.read_input()
