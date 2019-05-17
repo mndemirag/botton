@@ -29,11 +29,13 @@ const REPOSITORIES = [
 const BASE_URL = 'https://ghe.spotify.net/api/v3/';
 
 // base config when communicating with GHE API
-const requestConfig = { 
-  json: true,
-  headers: {
-    'Authorization': `token ${process.env.AUTHTOKEN}`,
-  },
+const requestConfig = (authToken) => {
+  return {
+    json: true,
+    headers: {
+      'Authorization': `token ${authToken}`,
+    },
+  };
 };
 
 const repoPRs = {};
@@ -46,47 +48,44 @@ const getRepos = () => {
 // Get all PRs for a specific repo
 const getPRs = repoId => {
   return repoPRs[repoId] || [];
-}
+};
 
-// Merge a specific PR in a specific repo. 
+// Merge a specific PR in a specific repo.
 const mergePR = (repoId, prId, token, callback) => {
   const url = `${BASE_URL}repos/first-aid/${repoId}/pulls/${prId}/merge`;
   request(url, {
-    ...requestConfig, 
+    ...requestConfig(token),
     method: 'PUT',
-    body: { merge_method: 'squash' },
-    headers: {
-      'Authorization': `token ${token}`,
-    }
+    body: { merge_method: 'squash' }
   }, (err, res, body) => {
-    if (err) { 
-      console.log(err); 
-      return callback(); 
+    if (err) {
+      console.log(err);
+      return callback();
     }
     callback(body);
   });
 };
 
 // Run once to setup automatic reload of GHE data
-const init = () => {
-  if (!process.env.AUTHTOKEN) {
-    console.error('Error: env var AUTHTOKEN is missing');
+const init = (authToken) => {
+  if (!authToken) {
+    console.error('AuthToken is missing!');
     process.exit(1);
   }
 
-  updatePRdata();
-  setInterval(updatePRdata, 10000);
+  updatePRdata(authToken);
+  setInterval(updatePRdata, 10000, authToken);
 };
 
-const updatePRdata = () => {
+const updatePRdata = (authToken) => {
   console.log('--- Updating PR data');
 
   REPOSITORIES.forEach(repoId => {
     const url = `${BASE_URL}repos/first-aid/${repoId.id}/pulls`;
-    
-    request(url, requestConfig, (err, res, body) => {
+
+    request(url, requestConfig(authToken), (err, res, body) => {
       if (err) { console.log(err); return; }
-      
+
       // Remove open and locked PRs
       const PRs = body.filter(pr => {
           if (pr.state !== 'open') return false;
@@ -96,16 +95,16 @@ const updatePRdata = () => {
 
       // Simply flush the current info about PRs
       repoPRs[repoId.id] = [];
-      
+
       // Fetch extra info for every open PR for this repo
       PRs.forEach(pr => {
         const url = `${BASE_URL}repos/first-aid/${repoId.id}/pulls/${pr.number}`;
-        request(url, requestConfig, (err, res, pr) => {
+        request(url, requestConfig(authToken), (err, res, pr) => {
           if (err) { console.log(err); return; }
-          
+
           if (!pr.mergeable) return;
-          if (pr.mergeable_state !== 'clean') return; 
-            
+          if (pr.mergeable_state !== 'clean') return;
+
           // Store only the part of the PR object that we need
           repoPRs[repoId.id].push({
             id: pr.number,
@@ -118,7 +117,7 @@ const updatePRdata = () => {
 };
 
 module.exports = {
-  init, 
+  init,
   getRepos,
   getPRs,
   mergePR,

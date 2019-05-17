@@ -74,7 +74,7 @@ class DeployModule(object):
         self.refresh_repos()
 
     def deploy(self, pressed_down):
-        if pressed_down:
+        if self.bob_api and pressed_down:
             if self.deployed:
                 self.handle_after_deploy_input()
             else:
@@ -95,7 +95,9 @@ class DeployModule(object):
 
     def select_change(self, type, on):
         if on:
-            if self.deployed:
+            if not self.bob_api:
+                return
+            elif self.deployed:
                 self.handle_after_deploy_input()
             else:
                 if type == 'repo prev':

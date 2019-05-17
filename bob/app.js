@@ -3,13 +3,14 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
+const credentials = require('./credentials');
 const gheService = require('./ghe-service');
 
-var reposRouter = require('./routes/repos');
+const reposRouter = require('./routes/repos');
 
-var app = express(); 
+const app = express();
 
-gheService.init();
+gheService.init(credentials.getFirstToken());
 
 app.use(logger('dev'));
 app.use(express.json());

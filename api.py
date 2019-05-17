@@ -17,8 +17,8 @@ class BobApi(object):
 
     def deploy(self, repo_name, pr_number):
         url = '{base}/repos/{repo_name}/pulls/{pr_number}/merge'.format(base=BOB_BASE_URL,
-                                                                      repo_name=repo_name,
-                                                                      pr_number=pr_number)
+                                                                        repo_name=repo_name,
+                                                                        pr_number=pr_number)
         return self.handle_response(requests.put(url, headers={'uid': self.uid}))
 
     def handle_response(self, response):
