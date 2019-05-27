@@ -49,6 +49,9 @@ class DeployModule(object):
         else:
             self.listen_for_rfid()
 
+    def is_logged_in(self):
+        return self.bob_api is not None
+
     def bump_logout_time(self):
         self.logout_time = datetime.now() + timedelta(minutes=LOGOUT_IN_MINUTES)
 
@@ -98,7 +101,7 @@ class DeployModule(object):
         self.refresh_repos()
 
     def deploy(self, pressed_down):
-        if self.bob_api and pressed_down:
+        if self.is_logged_in() and pressed_down:
             if self.deployed:
                 self.handle_after_deploy_input()
             elif len(self.pull_requests) and not self.pull_requests[0]['id'] == 0:
@@ -120,7 +123,7 @@ class DeployModule(object):
 
     def select_change(self, type, on):
         if on:
-            if not self.bob_api:
+            if not self.is_logged_in():
                 return
             elif self.deployed:
                 self.handle_after_deploy_input()
@@ -158,9 +161,9 @@ class DeployModule(object):
         self.select_repo_prev_button.read_input()
         self.select_pr_next_button.read_input()
         self.select_pr_prev_button.read_input()
-        if not self.bob_api:
+        if not self.is_logged_in():
             self.rfid.read()
-        if self.logout_time and self.logout_time_expired():
+        elif self.logout_time_expired():
             self.logout()
 
     def destroy(self):
