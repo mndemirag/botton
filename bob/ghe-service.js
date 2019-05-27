@@ -77,6 +77,11 @@ const init = (authToken) => {
   setInterval(updatePRdata, 10000, authToken);
 };
 
+function hasLabelPreventingMerge(l) {
+  const labelName = l.name.replace(/[-_ ]/g, '');
+  return labelName === 'intranslation' || labelName === 'donotmerge';
+}
+
 const updatePRdata = (authToken) => {
   console.log('--- Updating PR data');
 
@@ -104,6 +109,7 @@ const updatePRdata = (authToken) => {
 
           if (!pr.mergeable) return;
           if (pr.mergeable_state !== 'clean') return;
+          if (pr.labels.filter(l => hasLabelPreventingMerge(l)).length) return;
 
           // Store only the part of the PR object that we need
           repoPRs[repoId.id].push({
