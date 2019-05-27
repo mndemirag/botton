@@ -51,8 +51,7 @@ class DeployModule(object):
 
     def fetch_repos(self):
         self.repo_list = self.bob_api.get_repos()
-        print(self.repo_list)
-        if len(self.repo_list) is 0:
+        if self.repo_list and len(self.repo_list) is 0:
             self.repo_list = [
                 {'display_name': '-- No repos found'},
             ]
