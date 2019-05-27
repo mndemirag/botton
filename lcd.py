@@ -26,7 +26,7 @@ class LCD(object):
 
     def write(self, string, row):
         self.lcd.setCursor(0, row)
-        self.lcd.message('{message: <16}'.format(message=string))
+        self.lcd.message('{message: <16}'.format(message=string[:16]))
 
     def destroy(self):
         self.lcd.clear()
