@@ -27,14 +27,21 @@ class DeployModule(object):
         self.repo_list = []
         self.pull_requests = []
 
-        print('Authorize...')
-        self.lcd.write('Authorize...', 0)
         self.rfid = RFID(self.startup)
+        self.listen_for_rfid()
+
+    def listen_for_rfid(self):
+        self.bob_api = None
+        print('Authorize...')
+        self.lcd.clear()
+        self.lcd.write('Authorize...', 0)
 
     def startup(self, tag):
         print('Got tag ' + tag)
         self.bob_api = BobApi(tag)
         self.refresh_repos()
+        if not self.repo_list:
+            self.listen_for_rfid()
 
     def refresh_repos(self):
         self.lcd.clear()
