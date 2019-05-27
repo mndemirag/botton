@@ -160,7 +160,7 @@ class DeployModule(object):
         self.select_pr_prev_button.read_input()
         if not self.bob_api:
             self.rfid.read()
-        if self.logout_time_expired():
+        if self.logout_time and self.logout_time_expired():
             self.logout()
 
     def destroy(self):
