@@ -77,7 +77,7 @@ class DeployModule(object):
         if self.bob_api and pressed_down:
             if self.deployed:
                 self.handle_after_deploy_input()
-            else:
+            elif len(self.pull_requests):
                 pr = self.pull_requests[self.selected_pr_index]
                 print('Deploying ' + pr['title'])
                 self.lcd.clear()
