@@ -67,10 +67,11 @@ class DeployModule(object):
             ]
 
     def update_repo(self):
-        self.lcd.write(self.repo_list[self.selected_repo_index]['display_name'], 0)
-        self.lcd.write('Loading...', 1)
-        self.fetch_pull_requests()
-        self.update_pr()
+        if self.repo_list:
+            self.lcd.write(self.repo_list[self.selected_repo_index]['display_name'], 0)
+            self.lcd.write('Loading...', 1)
+            self.fetch_pull_requests()
+            self.update_pr()
 
     def update_pr(self):
         self.lcd.write(self.pull_requests[self.selected_pr_index]['title'], 1)
