@@ -1,8 +1,11 @@
+from datetime import datetime, timedelta
+
 from api import BobApi
 from button import Button
 from lcd import LCD
 from rfid import RFID
 
+LOGOUT_IN_MINUTES = 1
 DEPLOY_BUTTON_PORT = 22
 REPO_BUTTON_NEXT_PORT = 23
 REPO_BUTTON_PREV_PORT = 24
@@ -13,6 +16,7 @@ PR_BUTTON_PREV_PORT = 18
 class DeployModule(object):
     bob_api = None
     deployed = False
+    logout_time = None
 
     def __init__(self):
         self.deploy_button = Button(DEPLOY_BUTTON_PORT, self.deploy)
@@ -40,8 +44,20 @@ class DeployModule(object):
         print('Got tag ' + tag)
         self.bob_api = BobApi(tag)
         self.refresh_repos()
-        if not self.repo_list:
+        if self.repo_list:
+            self.bump_logout_time()
+        else:
             self.listen_for_rfid()
+
+    def bump_logout_time(self):
+        self.logout_time = datetime.now() + timedelta(minutes=LOGOUT_IN_MINUTES)
+
+    def logout_time_expired(self):
+        return self.logout_time < datetime.now()
+
+    def logout(self):
+        self.logout_time = None
+        self.listen_for_rfid()
 
     def refresh_repos(self):
         self.lcd.clear()
@@ -77,6 +93,7 @@ class DeployModule(object):
         self.lcd.write(self.pull_requests[self.selected_pr_index]['title'], 1)
 
     def handle_after_deploy_input(self):
+        self.bump_logout_time()
         self.deployed = False
         self.refresh_repos()
 
@@ -85,6 +102,7 @@ class DeployModule(object):
             if self.deployed:
                 self.handle_after_deploy_input()
             elif len(self.pull_requests) and not self.pull_requests[0]['id'] == 0:
+                self.bump_logout_time()
                 pr = self.pull_requests[self.selected_pr_index]
                 print('Deploying ' + pr['title'])
                 self.lcd.clear()
@@ -107,6 +125,7 @@ class DeployModule(object):
             elif self.deployed:
                 self.handle_after_deploy_input()
             else:
+                self.bump_logout_time()
                 if type == 'repo prev':
                     if self.selected_repo_index is 0:
                         self.selected_repo_index = len(self.repo_list) - 1
@@ -141,6 +160,8 @@ class DeployModule(object):
         self.select_pr_prev_button.read_input()
         if not self.bob_api:
             self.rfid.read()
+        if self.logout_time_expired():
+            self.logout()
 
     def destroy(self):
         self.lcd.clear()
