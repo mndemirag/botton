@@ -7,8 +7,6 @@ class RFID(object):
         self.rfid = MFRC522.MFRC522()
 
     def read(self):
-        print("Reading from rfid...")
-
         # Scan for cards
         (status, TagType) = self.rfid.MFRC522_Request(self.rfid.PICC_REQIDL)
 
