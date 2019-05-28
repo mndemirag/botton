@@ -97,12 +97,8 @@ const updatePRdata = (authToken) => {
     request(url, requestConfig(authToken), (err, res, body) => {
       if (err) { console.log(err); return; }
 
-      // Remove open and locked PRs
-      const PRs = body.filter(pr => {
-          if (pr.state !== 'open') return false;
-          if (pr.locked) return false;
-          return true;
-        });
+      // Remove non open and locked PRs
+      const PRs = body.filter(pr => pr.state === 'open' && !pr.locked);
 
       // Simply flush the current info about PRs
       repoPRs[repoId.id] = [];
