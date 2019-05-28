@@ -21,7 +21,11 @@ const REPOSITORIES = [
     id: 'support-site-router',
   },
   {
-    display_name: 'botton (meta!)',
+    display_name: 'self-reliant',
+    id: 'self-reliant',
+  },
+  {
+    display_name: 'botton-demo',
     id: 'botton-demo',
   }
 ];
