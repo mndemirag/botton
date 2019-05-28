@@ -82,8 +82,10 @@ const init = (authToken) => {
 };
 
 function hasLabelPreventingMerge(l) {
-  const labelName = l.name.replace(/[-_ ]/g, '');
-  return labelName === 'intranslation' || labelName === 'donotmerge';
+  const labelName = l.name.replace(/[-_' ]/g, '').toLowerCase();
+  return labelName === 'intranslation' ||
+         labelName === 'donotmerge' ||
+         labelName === 'dontmerge';
 }
 
 const updatePRdata = (authToken) => {
