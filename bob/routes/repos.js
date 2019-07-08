@@ -53,6 +53,7 @@ router.put('/:repoId/pulls/:prId/merge', (req, res, next) => {
       return res.json({ message: 'Success: all done' });
     }
 
+    console.log('Merge error', result);
     return res.json({ message: GENERIC_ERROR_MESSAGE })
   });
 
