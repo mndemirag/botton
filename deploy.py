@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from time import sleep
 
 from api import BobApi
 from button import Button
@@ -69,7 +70,10 @@ class DeployModule(object):
         self.update_repo()
 
     def fetch_repos(self):
-        self.repo_list = self.bob_api.get_repos()
+        data = self.bob_api.get_repos_and_user_name()
+        self.lcd.write('Welcome {name}'.format(name=data.get('name')), 0)
+        sleep(2)
+        self.repo_list = data.get('repos')
         if self.repo_list and len(self.repo_list) is 0:
             self.repo_list = [
                 {'display_name': '-- No repos found'},

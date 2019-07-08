@@ -7,9 +7,9 @@ class BobApi(object):
     def __init__(self, tag):
         self.tag = tag
 
-    def get_repos(self):
+    def get_repos_and_user_name(self):
         url = '{base}/repos'.format(base=BOB_BASE_URL)
-        return self.handle_response(requests.get(url, headers={'Authorization': self.tag})).get('repos')
+        return self.handle_response(requests.get(url, headers={'Authorization': self.tag}))
 
     def get_pull_requests(self, repo):
         url = '{base}/repos/{name}/pulls'.format(base=BOB_BASE_URL, name=repo)
