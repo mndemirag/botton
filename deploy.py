@@ -44,7 +44,7 @@ class DeployModule(object):
     def startup(self, tag):
         print('Got tag ' + tag)
         self.bob_api = BobApi(tag)
-        self.refresh_repos()
+        self.refresh_repos(show_welcome=True)
         if self.repo_list:
             self.bump_logout_time()
         else:
@@ -63,16 +63,19 @@ class DeployModule(object):
         self.logout_time = None
         self.listen_for_rfid()
 
-    def refresh_repos(self):
+    def refresh_repos(self, show_welcome=False):
         self.lcd.clear()
         self.lcd.write('Loading...', 0)
-        self.fetch_repos()
+        self.fetch_repos(show_welcome)
         self.update_repo()
 
-    def fetch_repos(self):
+    def fetch_repos(self, show_welcome):
         data = self.bob_api.get_repos_and_user_name()
-        self.lcd.write('Welcome {name}!'.format(name=data.get('user')), 0)
-        sleep(2)
+
+        if show_welcome:
+            self.lcd.write('Welcome {name}!'.format(name=data.get('user')), 0)
+            sleep(2)
+
         self.repo_list = data.get('repos')
         if self.repo_list and len(self.repo_list) is 0:
             self.repo_list = [
