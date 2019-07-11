@@ -70,17 +70,21 @@ class DeployModule(object):
         self.update_repo()
 
     def fetch_repos(self, show_welcome):
-        data = self.bob_api.get_repos_and_user_name()
+        try:
+            data = self.bob_api.get_repos_and_user_name()
 
-        if show_welcome:
-            self.lcd.write('Welcome {name}!'.format(name=data.get('user')), 0)
-            sleep(2)
+            if data.get('user') and show_welcome:
+                self.lcd.write('Welcome {name}!'.format(name=data.get('user')), 0)
+                sleep(2)
 
-        self.repo_list = data.get('repos')
-        if self.repo_list and len(self.repo_list) is 0:
-            self.repo_list = [
-                {'display_name': '-- No repos found'},
-            ]
+            self.repo_list = data.get('repos')
+            if self.repo_list and len(self.repo_list) is 0:
+                self.repo_list = [
+                    {'display_name': '-- No repos found'},
+                ]
+        except Exception:
+            self.lcd.write('Repo loading err', 0)
+            self.lcd.write('Please try again', 1)
 
     def fetch_pull_requests(self):
         self.pull_requests = self.bob_api.get_pull_requests(
