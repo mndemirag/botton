@@ -85,6 +85,7 @@ class DeployModule(object):
         except Exception:
             self.lcd.write('Repo loading err', 0)
             self.lcd.write('Please try again', 1)
+            sleep(2)
 
     def fetch_pull_requests(self):
         self.pull_requests = self.bob_api.get_pull_requests(
