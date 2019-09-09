@@ -1,7 +1,7 @@
 import hashlib
 import requests
 
-BOB_BASE_URL = 'https://bobian.spotify.com'
+BOB_BASE_URL = 'https://bobian.spotify.com/api'
 
 
 class BobApi(object):
