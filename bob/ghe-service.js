@@ -70,6 +70,21 @@ const mergePR = (repoId, prId, token, callback) => {
   });
 };
 
+const deleteBranch = (repoId, branch, token, callback) => {
+  const url = `${BASE_URL}repos/first-aid/${repoId}/branches/${branch}`;
+  request(url, {
+    ...requestConfig(token),
+    method: 'DELETE',
+    body: {}
+  }, (err, res, body) => {
+    if (err) {
+      console.log(err);
+      return callback();
+    }
+    callback(body);
+  });
+};
+
 // Run once to setup automatic reload of GHE data
 const init = (authToken) => {
   if (!authToken) {
