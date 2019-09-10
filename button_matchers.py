@@ -11,9 +11,10 @@ except ImportError:
 
 
 class ButtonCombinationMatcher(object):
-    button_changes = []
-
-    secret_combination = []
+    def __init__(self, secret_combination):
+        super(ButtonCombinationMatcher, self).__init__()
+        self.button_changes = []
+        self.secret_combination = secret_combination
 
     def reset(self):
         self.button_changes = []
@@ -31,8 +32,6 @@ class ButtonCombinationMatcher(object):
 
 
 class NetworkInfo(ButtonCombinationMatcher):
-    showing_info = False
-
     secret_combination = [
         'repo next',
         'repo next',
@@ -41,8 +40,10 @@ class NetworkInfo(ButtonCombinationMatcher):
     ]
 
     def __init__(self, lcd, after_info_message):
+        super(NetworkInfo, self).__init__(NetworkInfo.secret_combination)
         self.after_info_message = after_info_message
         self.lcd = lcd
+        self.showing_info = False
 
     def get_ip_address(self, ifname):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -80,6 +81,7 @@ class RestartApp(ButtonCombinationMatcher):
     ]
 
     def __init__(self, lcd):
+        super(RestartApp, self).__init__(RestartApp.secret_combination)
         self.lcd = lcd
 
     def match(self):
