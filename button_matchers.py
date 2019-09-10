@@ -79,5 +79,9 @@ class RestartApp(ButtonCombinationMatcher):
         'pr next'
     ]
 
+    def __init__(self, lcd):
+        self.lcd = lcd
+
     def match(self):
+        self.lcd.write('Restarting app..', 0)
         Popen(['supervisorctl', 'restart', 'botton'], stdout=DEVNULL, stderr=DEVNULL)

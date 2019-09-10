@@ -29,7 +29,7 @@ class DeployModule(object):
         self.select_pr_next_button = Button(PR_BUTTON_NEXT_PORT, lambda on: self.select_change('pr next', on))
         self.select_pr_prev_button = Button(PR_BUTTON_PREV_PORT, lambda on: self.select_change('pr prev', on))
         self.lcd = LCD()
-        self.button_matchers = [NetworkInfo(self.lcd, LOG_IN_MESSAGE), RestartApp()]
+        self.button_matchers = [NetworkInfo(self.lcd, LOG_IN_MESSAGE), RestartApp(self.lcd)]
 
         self.selected_repo_index = 0
         self.selected_pr_index = 0
