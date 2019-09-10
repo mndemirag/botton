@@ -1,3 +1,4 @@
+import signal
 from time import sleep
 
 from RPi import GPIO
@@ -26,9 +27,22 @@ class Main(object):
         except KeyboardInterrupt:
             print('\nShutting down..')
         finally:
-            for module in self.modules:
-                module.destroy()
-            GPIO.cleanup()
+            self.destroy()
+
+    def destroy(self):
+        for module in self.modules:
+            module.destroy()
+        GPIO.cleanup()
 
 
-Main().run()
+main = Main()
+main.run()
+
+
+def end_read(signal, frame):
+    print "Ctrl+C captured, closing down.."
+    main.destroy()
+
+
+# Hook the SIGINT
+signal.signal(signal.SIGINT, end_read)
