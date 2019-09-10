@@ -3,8 +3,11 @@ from time import sleep
 
 from api import BobApi
 from button import Button
+from info import NetworkInfo
 from lcd import LCD
 from rfid import RFID
+
+LOG_IN_MESSAGE = 'Authorize...'
 
 LOGOUT_IN_MINUTES = 1
 DEPLOY_BUTTON_PORT = 22
@@ -26,6 +29,7 @@ class DeployModule(object):
         self.select_pr_next_button = Button(PR_BUTTON_NEXT_PORT, lambda on: self.select_change('pr next', on))
         self.select_pr_prev_button = Button(PR_BUTTON_PREV_PORT, lambda on: self.select_change('pr prev', on))
         self.lcd = LCD()
+        self.network_info = NetworkInfo(self.lcd, LOG_IN_MESSAGE)
 
         self.selected_repo_index = 0
         self.selected_pr_index = 0
@@ -37,12 +41,13 @@ class DeployModule(object):
 
     def listen_for_rfid(self):
         self.bob_api = None
-        print('Authorize...')
+        print(LOG_IN_MESSAGE)
         self.lcd.clear()
-        self.lcd.write('Authorize...', 0)
+        self.lcd.write(LOG_IN_MESSAGE, 0)
 
     def startup(self, tag):
         print('Got tag ' + tag)
+        self.network_info.reset()
         self.bob_api = BobApi(tag)
         self.refresh_repos(show_welcome=True)
         if self.repo_list:
@@ -136,7 +141,7 @@ class DeployModule(object):
     def select_change(self, type, on):
         if on:
             if not self.is_logged_in():
-                return
+                self.network_info.button_changed(type)
             elif self.deployed:
                 self.handle_after_deploy_input()
             else:
