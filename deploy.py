@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from time import sleep
+from time import sleep, time
 
 from api import BobApi
 from button import Button
@@ -178,9 +178,9 @@ class DeployModule(object):
         self.select_repo_prev_button.read_input()
         self.select_pr_next_button.read_input()
         self.select_pr_prev_button.read_input()
-        if not self.is_logged_in():
+        if (not self.is_logged_in()) and int(time() % 1 * 100) == 0:
             self.rfid.read()
-        elif self.logout_time_expired():
+        elif self.is_logged_in() and self.logout_time_expired():
             self.logout()
 
     def destroy(self):
