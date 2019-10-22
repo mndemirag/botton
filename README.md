@@ -10,7 +10,7 @@ The Botton should run on a Raspberry Pi which has the following set up:
 3. Install dependencies by running `sudo apt-get install python-pip python-smbus python-rpi.gpio i2c-tools`
 4. This repo should be in `/home/botton/botton` (you can't clone it from ghe.spotify.net though since the Raspberry won't have access - push it to the Raspberry by using scp or something instead)
 5. To go the folder and run `pip install -r requirements.txt`
-6. Copy [`botton.conf`]('conf/supervisord/botton.conf') to `/etc/supervisor/conf.d/botton.conf`
+6. Copy [`botton.conf`](conf/supervisord/botton.conf) to `/etc/supervisor/conf.d/botton.conf`
 7. Run `sudo supervisorctl start botton`
 
 ## Run
